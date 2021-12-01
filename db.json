@@ -1,0 +1,26 @@
+{
+  "mannens": [
+    {
+      "stock": 3,
+      "name": "黒蜜",
+      "image": "image/kuromitu.jpg",
+      "price": 7520,
+      "id": 0
+    },
+    {
+      "stock": 3,
+      "name": "杏",
+      "image": "image/anzu.jpg",
+      "price": 8230,
+      "id": 1
+    },
+    {
+      "stock": 3,
+      "name": "ラムネ",
+      "image": "image/ramune.jpg",
+      "price": 6580,
+      "id": 2
+    }
+  ],
+  "cart": []
+}
