@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+	<script src="mannen.js"></script>
+	<link rel="stylesheet" href="style.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+	<title>MannenTo</title>
+</head>
+
+<body>
+	<div id="mannento">
+			<div id="mannenApp"><!--連携始まり-->
+
+			<header>
+			<div class="headerMenu">
+			<i class="material-icons-round cartIcon"v-on:click = "toCart('cart')" >shopping_cart</i>
+			<p>{{cart.length}} in cart</p>
+		</div>
+			</header>
+
+<div class="main">
+<!--商品一覧トップ-->
+			<template class="itemarea" v-if="page == 'top'">
+
+				<div class="topLogo">
+					<img class="textArea" src="image/toprogo.png" alt="">
+					<p>　うまみ、にじむ、よろこび。</p>
+				</div>
+				
+				<div class="nav">
+					<p class="navManu" v-on:click="toTop()">Home</p>
+					<p class="navManu" v-on:click="toAbout()">About</p>
+					<p class="navManu" v-on:click="toItem()">Item</p>
+
+					<div class="search">
+					<input class="serchbox" type="text" v-model="input" v-on:keydown.enter="searchMannenByName">
+					<i class="material-icons-round" v-on:click="searchMannenByName">search</i>
+					</div>
+				</div>
+				
+				<div class="textArea">
+					<img src="image/top.jpg" alt="">
+					<div class="text">
+					<p>お気に入りで、「かく」ということ。</p>
+
+					<p>お気に入りの筆でかいていく、その動きには、味がある。<br />
+					苦いことも、酸っぱいことも、甘くうまく、滲んでいく。<br />
+					</p>
+
+					<p>日常の、甘みを、うまみを。あなたの手のひらで、ずっと。<br />
+						「手のひらで触れたくなる、うまみの一本」。そんな筆記用具を集めました。</p>
+						
+					<p>生きるうまみを引き出したい、筆記用具たちの溜まり場。<br />MannenToです。</p>
+						
+					<p>さあ、あなたの手のひらで触れたくなる一本、MannenToで、見つけてみてください。</p>
+					</div>
+				</div>
+
+				<div class="products">
+
+				<div id="mannen" v-for="(mannen, index) in mannens" v-bind:key="index" class="card">
+				<img v-bind:key="mannen.id" class="item_image" v-bind:src="mannen.image" alt="">
+				<hr class="hr">
+
+				<div class="item_sentence">
+					<p class="sentence"> {{mannen.name}}</p>
+					<p class="price">¥{{mannen.price}}</p>
+					<p >在庫:{{mannen.stock}}</p>
+					<button v-if="mannen.stock > 0"v-on:click="addItem(mannen) ;mannen.stock-=1;" v-bind:name="mannen.id">カートに入れる</button>
+					<button v-else-if="mannen.stock <= 0"v-bind:name="mannen.id">売り切れ</button>
+				</div>
+				</div>
+				</div>
+			
+			</template>
+
+			<!--カートページ-->
+			<template v-if="page == 'cart'">
+
+				<div class="subLogo">
+					<img src="image/subrogo.png" alt="">
+				</div>
+
+				<div class="title">
+				<h2>Cart</h2> 	
+				</div>
+
+				
+				<div class="products">
+
+					<div v-for="(mannen, index) in cart" v-band:key="index" class="card">
+					<img  class="item_image" v-bind:src="mannen.image" alt="">
+					<hr class="hr">
+	
+						<div class="item_sentence">
+							<p class="sentence"> {{mannen.name}}</p>
+							<p class="price">¥{{mannen.price}}</p>
+							<p>在庫:{{mannen.stock}}</p>
+							<button v-on:click="removeItem(index); mannen.stock+=1" v-bind:name="mannen.id">カートから削除</button>
+						</div>
+					</div>
+				</div>
+
+				<div class="total">
+					<p class="large">合計：　　　　　¥{{total}}</p>
+				</div>
+
+				<div class="buy" v-on:click="toGet()">
+					<p>購入する</p>
+				</div>
+					
+				<div class="continue" v-on:click="toTop()">
+					<p>買い物を続ける</p>
+				</div>
+
+			</template>
+
+			<!--購入完了ページ-->
+			<template v-if="page == 'get'">
+
+				<div class="subLogo">
+					<img src="image/subrogo.png" alt="">
+				</div>
+
+				<div class="title">
+					<h2>Thank you!</h2> 	
+				</div>
+
+				<div class="textBox">
+					<p>ご利用、ありがとうございます。<br>
+						商品の到着をお待ちください。</p>
+				</div>
+
+				<div class="products">
+
+					<div v-for="(mannen, index) in viewCart" v-band:key="index" class="card">
+					<img  class="item_image" v-bind:src="mannen.image" alt="">
+					<hr class="hr">
+	
+						<div class="item_sentence">
+							<p class="sentence"> {{mannen.name}}</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="buy" v-on:click="toTop()">
+					<p>トップへ</p>
+				</div>
+
+
+			</template>
+
+			<!--aboutページ-->
+			<template v-if="page == 'about'">
+
+				<div class="subLogo">
+					<img src="image/subrogo.png" alt="">
+				</div>
+
+				<div class="nav">
+					<p class="navManu" v-on:click="toTop()">Home</p>
+					<p class="navManu" v-on:click="toAbout()">About</p>
+					<p class="navManu" v-on:click="toItem()">Item</p>
+
+					<div class="search">
+					<input class="serchbox" type="text" v-model="input" v-on:keydown.enter="searchMannenByName">
+					<i class="material-icons-round" v-on:click="searchMannenByName">search</i>
+					</div>
+				</div>
+
+				<div class="title">
+					<h2>What is MannenTo?</h2>
+				</div>
+				<div class="textArea">
+					<div class="text">
+						<p>MannenToは、「手のひらで触れたくなる、うまみの一本」をテーマにした、筆記用具専門セレクトショップ。<br />
+							ただ生きるだけなら、もはや筆記用具は必需品ではないのかもしれないけれど。<br />
+							お気に入りの筆があって、自分の手のひらで動かしてかくことは、やっぱり楽しいし、役に立つ。<br />
+							もっとずっと、自分の手で触れたくなる一本を、生活に取り入れられたなら。<br />
+							それはきっと、生きるうまみが滲む、素敵な喜びになるのではないでしょうか。</p>
+							
+							<p>そんな考えから生まれたのが、このMannenToです。</p>
+					</div>
+				</div>
+
+				<div class="title">
+					<h2>The origin</h2>
+				</div>
+				<div class="textArea">
+					<div class="text">
+						<p>お名前の由来は、万年筆と金平糖。</p>
+
+						<p>万年筆がもつ永続性や特別感に、金平糖の持つ地道さ・甘さ・素朴さを掛け合わせて誕生。<br />
+						さらに「万年」という単語からは、「色々なことが起き、かつずっと続く雑多な日常」を。<br />
+						「To」という音からは、「〜に、至るまで」といった意味を込めています。<br />
+						そして筆たちが、世界や時間の制約を受けないよう、ローマ字表記を採用しました。</p>
+
+						<p>そんな意味がこもったMannenToで販売するのは、「お気に入りにしたい、手で触れたい」そんな選りすぐりの筆記用具です。<br />
+						その場凌ぎではなく、時を重ねて、じっくり育てていきたい文房具を集めました。<br />
+						その一つ一つには、甘みやうまみを醸し出すような名前をチョイス。<br />
+						使うことが、そして使った上で生きることが、もっとずっと楽しくなるように。<br />
+						MannenToの、願いです。</p>
+					</div>
+				</div>
+
+				<div class="title">
+					<h2>Bland Mark</h2>
+				</div>
+				<div class="textArea">
+					<div class="text">
+						<p>MannenToのブランドマークは、縦と横の２種類。</p>
+
+						<p>これは縦書きにも横書きにも対応する、筆記の文化を反映しています。<br />
+						縦長のフォルムは、ペンの細長さを。横の隅への配置は、冊子などにつくノンブルを意識しています。</p>
+
+						<p>真ん中の先端を丸くした○の文字は、筆特有の「墨だまり」と「ペン先の形」を表現。<br />
+						黒く塗りつぶされたアルファベットoには、濁点やハンコのような意味合いが込められています。</p>
+
+						<p>またロゴを包む枠からは、掛け軸と端から溢れる市松模様をイメージ。「日常に寄り添いながら気を高める・繁栄する」という願いと、「こぼれてもはみ出しても大丈夫」という２つの願いが詰まっています。</p>
+
+						<p>いろんな想い・願いが、このブランドマークを通じて、あなたの手のひらに渡りますように。<br />
+						MannenToのお品物と一緒に、お届けいたします。<br />
+						</p>
+					</div>
+				</div>
+
+
+
+			</template>
+
+			<!--itemページ-->
+
+			<template v-if="page == 'item'">
+
+				<div class="subLogo">
+					<img src="image/subrogo.png" alt="">
+				</div>
+
+				<div class="nav">
+					<p class="navManu" v-on:click="toTop()">Home</p>
+					<p class="navManu" v-on:click="toAbout()">About</p>
+					<p class="navManu" v-on:click="toItem()">Item</p>
+
+					<div class="search">
+					<input class="serchbox" type="text" v-model="input" v-on:keydown.enter="searchMannenByName">
+					<i class="material-icons-round" v-on:click="searchMannenByName">search</i>
+					</div>
+				</div>
+
+				<div class="textArea">
+					<p class="text">甘み・うまみを、必要以上に。そんなコンセプトから生まれたMannenToの筆記用具は、どれも一品級。
+						どんな美味しさを足そうか、心躍らせてお待ちください。
+					</p>
+				</div>
+
+				<div class="products">
+
+					<div id="mannen" v-for="(mannen, index) in mannens" v-bind:key="index" class="card">
+					<img v-bind:key="mannen.id" class="item_image" v-bind:src="mannen.image" alt="">
+					<hr class="hr">
+	
+						<div class="item_sentence">
+							<p class="sentence"> {{mannen.name}}</p>
+							<p class="price">¥{{mannen.price}}</p>
+							<p >在庫:{{mannen.stock}}</p>
+							<button v-if="mannen.stock > 0"v-on:click="addItem(mannen) ;mannen.stock-=1;" v-bind:name="mannen.id">カートに入れる</button>
+							<button v-else-if="mannen.stock <= 0"v-bind:name="mannen.id">売り切れ</button>
+						</div>
+					</div>
+				</div>
+			</template>
+</div>
+
+
+			<footer>
+				<div class="footerMenu">
+					<img src="image/whiterogo.png" alt="">
+					<p> ©︎ 2021 NE20-1052B</p>
+				</div>
+			</footer>
+
+
+		</div>
+
+
+	</div>
+	
+</body>
+</html>
